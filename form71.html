@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Medical Exam Form</title>
+    <script>
+        
+
+
+
+        function exportToJson() {
+          var data = {
+              
+              medicalHistory: document.getElementById("medicalHistory").value,
+              cardio: document.getElementById("cardio").value,
+              pneumo: document.getElementById("pneumo").value,
+
+              gcsScore: calculateGcsScore(), // Ensure this function returns the calculated GCS score
+
+              // Include other existing fields here
+
+          };
+
+          // Rest of your code for handling checkboxes, radio buttons, etc.
+        
+
+
+
+
+
+          // For Checkboxes
+          var checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+          data['checkboxes'] = Array.from(checkboxes).map(function(checkbox) {
+              return checkbox.value;
+          });
+
+          // For Radio Buttons
+          var radioGroups = document.querySelectorAll('input[type="radio"]');
+          var radioGroupNames = new Set(Array.from(radioGroups).map(radio => radio.name));
+
+          radioGroupNames.forEach(function(name) {
+              var selectedRadio = document.querySelector(`input[name="${name}"]:checked`);
+              data[name] = selectedRadio ? selectedRadio.value : null;
+          });
+
+
+
+          
+
+          var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
+          var downloadAnchorNode = document.createElement('a');
+          downloadAnchorNode.setAttribute("href", dataStr);
+          downloadAnchorNode.setAttribute("download", "form_data.json");
+          document.body.appendChild(downloadAnchorNode);
+          downloadAnchorNode.click();
+          downloadAnchorNode.remove();
+            }
+
+        function exportToCsv() {
+            var data = [
+
+              ["gcsScore", calculateGcsScore()],
+
+                ["medicalHistory", document.getElementById("medicalHistory").value],
+                ["cardio", document.getElementById("cardio").value],
+                ["pneumo", document.getElementById("pneumo").value]
+                // Add other fields here as necessary
+            ];
+
+            var csvContent = "data:text/csv;charset=utf-8," + data.map(e => e.join(",")).join("\n");
+            var downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", csvContent);
+            downloadAnchorNode.setAttribute("download", "form_data.csv");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+    </script>
+
+    <style type="text/css" media="screen">
+
+        table{
+        border-collapse:collapse;
+        border:1px solid #FF0000;
+        }
+
+        table td{
+        border:1px solid #FF0000;
+
+        padding-top: 10px;
+        padding-bottom: 20px;
+        padding-left: 30px;
+        padding-right: 40px;
+        }
+
+
+        table tr:nth-child(7) {
+        background-color: rgba(255, 255, 0, 0.05); /* Jaune avec 20% d'opacité */
+        }
+
+        table tr:nth-child(8) {
+        background-color: rgba(255, 255, 0, 0.05); /* Jaune avec 20% d'opacité */
+        }
+
+
+        
+
+   
+
+        .highlight {
+        background-color: red;
+        opacity: 0.5; /* Set opacity to 100% for full visibility */
+        color: white; /* Optional: Change text color to white for better contrast */
+}
+        
+   </style>
+
+
+</head>
+<body>
+    <form action="/submit-form-url" method="post">
+
+
+
+        <h2>Medical Exam Form</h2>
+
+        <!-- Patient Personal Information -->
+        <label for="patientFirstName">Patient prenom:</label>
+        <input type="text" name="patientFirstName" value="Albert" readonly><br><br>
+
+        <label for="patientLastName">Patient nom:</label>
+        <input type="text" name="patientLastName" value="Hofmann" readonly><br><br>
+
+        <label for="patientJob">metier:</label>
+        <input type="text" name="patientJob" value="chimiste" readonly><br><br>
+
+
+
+        <label for="dob">Date of Birth:</label>
+        <input type="text" name="dob" value="11 January 1906" readonly><br><br>
+
+        <label for="gender">Gender:</label>
+        <select id="gender" name="gender">
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+        </select><br><br>
+
+
+
+        <h3>ANTECEDANTS </h3>
+              <div>
+                <label><input type="checkbox" name="antecedants" value="diab1"> diabete type 1</label>
+                <label><input type="checkbox" name="antecedants" value="diab2NIR"> diabete type 2 NIR</label>                
+                <label><input type="checkbox" name="antecedants" value="diab2IR"> diabete type 2 IR</label><br>
+                <label><input type="checkbox" name="antecedants" value="dyslipidemie"> dyslipidemie</label><br>
+                <label><input type="checkbox" name="antecedants" value="tabac"> tabac</label><br>
+                <label><input type="checkbox" name="antecedants" value="alcool"> alcool</label><br>
+                <label><input type="checkbox" name="antecedants" value="cannabis"> cannabis</label><br>
+                <label><input type="checkbox" name="antecedants" value="autres_drogues"> autres_drogues</label><br>
+                <label><input type="checkbox" name="antecedants" value="cancer"> cancer</label><br>
+                <label><input type="checkbox" name="antecedants" value="psy"> psy</label><br>
+                <label><input type="checkbox" name="antecedants" value="epilepsie"> epilepsie</label><br>
+                <label><input type="checkbox" name="antecedants" value="sd_depressif"> sd_depressif</label><br>
+                <label><input type="checkbox" name="antecedants" value="sejour_reanimation"> sejour_reanimation</label><br>
+                <label><input type="checkbox" name="antecedants" value="zone_paludisme_moins3mois"> zone_paludisme_moins3mois</label><br>
+              </div>
+
+
+
+        <!-- Blood Transfusion Section -->
+        <h3>Deja eu une coloscopie ? </h3>
+        <label><input type="radio" name="deja_colo" value="yes" onclick="showCalendar()"> Yes</label>
+        <label><input type="radio" name="deja_colo" value="never" onclick="hideCalendar()"> Never</label>
+        <div id="calendar" style="display:none;">
+            <input type="date" name="coloscopie_date">
+        </div>
+
+        <h3>Deja eu une frottis du col de l' uterus ? </h3>
+        <label><input type="radio" name="deja_frottis_col_uterus" value="yes" onclick="showCalendar()"> Yes</label>
+        <label><input type="radio" name="deja_frottis_col_uterus" value="never" onclick="hideCalendar()"> Never</label>
+        <div id="calendar" style="display:none;">
+            <input type="date" name="frottis_col_uterus_date">
+        </div>
+
+        <h3>Deja eu une mammographie ? </h3>
+        <label><input type="radio" name="deja_mammo" value="yes" onclick="showCalendar()"> Yes</label>
+        <label><input type="radio" name="deja_mammo" value="never" onclick="hideCalendar()"> Never</label>
+        <div id="calendar" style="display:none;">
+            <input type="date" name="mammo_date">
+        </div>
+
+        <h3>Deja vaccine contre le tetanos ? </h3>
+        <label><input type="radio" name="deja_vac_tetanos" value="yes" onclick="showCalendar()"> Yes</label>
+        <label><input type="radio" name="deja_vac_tetanos" value="never" onclick="hideCalendar()"> Never</label>
+        <div id="calendar" style="display:none;">
+            <input type="date" name="ac_tetanos_date">
+        </div>
+
+
+
+
+        <input type="submit" value="Submit">
+
+        
+
+        <!-- Medical History -->
+        <h3>Medical History</h3>
+        <textarea id="medicalHistory" name="medicalHistory" rows="4" cols="50" placeholder="Enter medical history here..."></textarea><br><br>
+
+
+        <h3>Condition RDV</h3>
+        <label><input type="radio" name="rdv" value="sans_rdv" > Sans RDV</label>
+        <label><input type="radio" name="rdv" value="programme" > Programme</label>
+        <label><input type="radio" name="rdv" value="emergency" > En Urgence</label>
+        <label><input type="radio" name="rdv" value="requisition" > Requisition</label>
+
+        <br><br>
+
+        
+
+        <!-- examen Cardiologique -->
+        <h3>examen Cardiologique</h3>
+
+        <div>
+                <label><input type="checkbox" name="exam_cardio" value="angor effort"> angor effort</label>
+                <label><input type="checkbox" name="exam_cardio" value="angor instable"> angor instable</label>
+                <label><input type="checkbox" name="exam_cardio" value="palpitation effort"> palpitation effort</label><br>
+                <label><input type="checkbox" name="exam_cardio" value="palpitation repos"> palpitation repos</label>
+                <label><input type="checkbox" name="exam_cardio" value="OMI"> OMI </label>
+                <label><input type="checkbox" name="exam_cardio" value="OMI"> Signe Homans </label>
+                <label><input type="checkbox" name="exam_cardio" value="TJ"> TJ</label>
+                <label><input type="checkbox" name="exam_cardio" value="RHJ"> RHJ</label><br>
+                <label><input type="checkbox" name="exam_cardio" value="syncope"> syncope</label>
+                <label><input type="checkbox" name="exam_cardio" value="HTA"> HTA</label>
+                <label><input type="checkbox" name="exam_cardio" value="perte pouls periph"> perte pouls periph</label><br>
+                <label><input type="checkbox" name="exam_cardio" value="souffle valvulaire"> souffle valvulaire</label>
+                <label><input type="checkbox" name="exam_cardio" value="cyanose"> cyanose</label>
+                <label><input type="checkbox" name="exam_cardio" value="bruit galop"> bruit galop</label>
+                <label><input type="checkbox" name="exam_cardio" value="fremitus"> fremitus</label><br>
+                <label><input type="checkbox" name="exam_cardio" value="souffle carotidien"> souffle carotidien</label><br>
+                <label><input type="checkbox" name="exam_cardio" value="baisse FEVG"> baisse FEVG</label><br>
+                <label><input type="checkbox" name="exam_cardio" value="epanch pericarde"> epanch pericarde</label><br>
+              </div>
+
+
+        <textarea id="cardio" name="cardio" rows="4" cols="50" placeholder="signes cardio ici..."></textarea><br><br>
+
+        <!-- examen Pneumologique -->
+        <h3>examen Pneumologique</h3>
+
+        <div>
+                <label><input type="checkbox" name="exam_pneumo" value="frein expi"> frein expi</label>
+                <label><input type="checkbox" name="exam_pneumo" value="sibilant"> sibilant</label>
+                <label><input type="checkbox" name="exam_pneumo" value="hemoptysie"> hemoptysie</label><br>
+                <label><input type="checkbox" name="exam_pneumo" value="toux seche"> toux seche</label>
+                <label><input type="checkbox" name="exam_pneumo" value="toux grasse"> toux grasse </label>
+                <label><input type="checkbox" name="exam_pneumo" value="expectoration"> expectoration</label>
+                <label><input type="checkbox" name="exam_pneumo" value="dyspnee repos"> dyspnee repos</label><br>
+                <label><input type="checkbox" name="exam_pneumo" value="dyspnee effort"> dyspnee effort</label>
+                <label><input type="checkbox" name="exam_pneumo" value="desatur < 90%"> desatur < 90%</label>
+                <label><input type="checkbox" name="exam_pneumo" value="polypnee"> polypnee</label><br>
+                <label><input type="checkbox" name="exam_pneumo" value="sueurs"> sueurs</label>
+                <label><input type="checkbox" name="exam_pneumo" value="cyanose"> cyanose</label>
+                <label><input type="checkbox" name="exam_pneumo" value="sd restictif"> sd restictif</label>
+                <label><input type="checkbox" name="exam_pneumo" value="thorax en tonneau"> thorax en tonneau</label><br>
+                <label><input type="checkbox" name="exam_pneumo" value="sd alveolaire"> sd alveolaire</label><br>
+                <label><input type="checkbox" name="exam_pneumo" value="sd intersticiel"> sd intersticiel</label><br>
+                <label><input type="checkbox" name="exam_pneumo" value="atelectasie"> atelectasie</label><br>
+              </div>
+
+
+        <textarea id="pneumo" name="pneumo" rows="4" cols="50" placeholder="signes pneumo ici..."></textarea><br><br>
+
+          <h3>appareil digestif </h3>
+              <div>
+                <label><input type="checkbox" name="exam_digestif" value="diarhee"> diarhee</label>
+                <label><input type="checkbox" name="exam_digestif" value="deshydrate"> deshydrate</label>
+                <label><input type="checkbox" name="exam_digestif" value="constipation"> constipation</label>
+                <label><input type="checkbox" name="exam_digestif" value="bruits_normaux"> bruits normaux</label>
+                <label><input type="checkbox" name="exam_digestif" value="fecalome"> fecalome</label><br>
+                <label><input type="checkbox" name="exam_digestif" value="nausee"> nausee</label>
+                <label><input type="checkbox" name="exam_digestif" value="vomissement"> vomissement</label>
+                <label><input type="checkbox" name="exam_digestif" value="meteorisme"> meteorisme</label>
+                <label><input type="checkbox" name="exam_digestif" value="ascite"> ascite</label><br>
+                <label><input type="checkbox" name="exam_digestif" value="hemathemese"> hemathemese</label>
+                <label><input type="checkbox" name="exam_digestif" value="rectorragie"> rectorragie</label>
+                <label><input type="checkbox" name="exam_digestif" value="melena"> melena</label><br>
+                <label><input type="checkbox" name="exam_digestif" value="abd cicatriciel"> abd cicatriciel</label>
+                <label><input type="checkbox" name="exam_digestif" value="ictere"> ictere</label>
+                <label><input type="checkbox" name="exam_digestif" value="angiome stellaire"> angiome stellaire</label>
+                <label><input type="checkbox" name="exam_digestif" value="circulation veineuse abdo collat"> circulation veineuse abdo collat</label><br>
+                <label><input type="checkbox" name="exam_digestif" value="hepatomegalie"> hepatomegalie</label><br>
+                <label><input type="checkbox" name="exam_digestif" value="splenomegalie"> splenomegalie</label><br>
+              </div>
+              
+          <h3>dermato </h3>
+              <div>
+                <label><input type="checkbox" name="exam_dermato" value="prurit"> prurit</label>
+                <label><input type="checkbox" name="exam_dermato" value="ecchymose-purpura"> ecchymose-purpura</label>
+                <label><input type="checkbox" name="exam_dermato" value="bulles"> bulles</label><br>
+                <label><input type="checkbox" name="exam_dermato" value="alopecie"> alopecie</label>
+                <label><input type="checkbox" name="exam_dermato" value="...derm"> ...derm</label>
+                
+              </div>
+              <!-- Add more sections for Percussion, Auscultation, etc. -->
+              <input type="submit" value="Submit">
+
+
+        <h3>examen Neuro</h3>
+
+        <div>
+                <label><input type="checkbox" name="exam_neuro" value="sd_meninge"> sd_meninge</label>
+                <label><input type="checkbox" name="exam_neuro" value="sd_pyramidal"> sd_pyramidal</label>
+                <label><input type="checkbox" name="exam_neuro" value="sd_extrapyramidal"> sd_extrapyramidal</label><br>
+                <label><input type="checkbox" name="exam_neuro" value="ataxie"> ataxie</label>
+                <label><input type="checkbox" name="exam_neuro" value="apraxie"> apraxie</label>
+                <label><input type="checkbox" name="exam_neuro" value="anosognosie"> anosognosie</label>
+                <label><input type="checkbox" name="exam_neuro" value="insomnie"> insomnie</label>
+                <label><input type="checkbox" name="exam_neuro" value="demence"> demence</label>
+                <label><input type="checkbox" name="exam_neuro" value="myosis"> myosis</label>
+                <label><input type="checkbox" name="exam_neuro" value="mydriase"> mydriase</label>
+                
+              </div>
+
+        <fieldset>
+            <legend>Eye Response (E)</legend>
+            <input type="radio" id="eye4" name="eye" value="4" onclick="updateGcsScore()" ><label for="eye4">4 - Spontaneously</label><br>
+            <input type="radio" id="eye3" name="eye" value="3" onclick="updateGcsScore()" ><label for="eye3">3 - To speech</label><br>
+            <input type="radio" id="eye2" name="eye" value="2" onclick="updateGcsScore()" ><label for="eye2">2 - To pain</label><br>
+            <input type="radio" id="eye1" name="eye" value="1" onclick="updateGcsScore()" ><label for="eye1">1 - No eye opening</label>
+        </fieldset>
+        
+        <fieldset>
+            <legend>Verbal Response (V)</legend>
+            <input type="radio" id="verbal5" name="verbal" value="5" onclick="updateGcsScore()" ><label for="verbal5">5 - Oriented</label><br>
+            <input type="radio" id="verbal4" name="verbal" value="4" onclick="updateGcsScore()" ><label for="verbal4">4 - Confused</label><br>
+            <input type="radio" id="verbal3" name="verbal" value="3" onclick="updateGcsScore()" ><label for="verbal3">3 - Inappropriate words</label><br>
+            <input type="radio" id="verbal2" name="verbal" value="2" onclick="updateGcsScore()" ><label for="verbal2">2 - Incomprehensible sounds</label><br>
+            <input type="radio" id="verbal1" name="verbal" value="1" onclick="updateGcsScore()" ><label for="verbal1">1 - No verbal response</label>
+        </fieldset>
+
+        <fieldset>
+            <legend>Motor Response (M)</legend>
+            <input type="radio" id="motor6" name="motor" value="6" onclick="updateGcsScore()" ><label for="motor6">6 - Obeys commands</label><br>
+            <input type="radio" id="motor5" name="motor" value="5" onclick="updateGcsScore()" ><label for="motor5">5 - Localizes pain</label><br>
+            <input type="radio" id="motor4" name="motor" value="4" onclick="updateGcsScore()" ><label for="motor4">4 - Withdraws to pain</label><br>
+            <input type="radio" id="motor3" name="motor" value="3" onclick="updateGcsScore()" ><label for="motor3">3 - Flexion to pain (decorticate response)</label><br>
+            <input type="radio" id="motor2" name="motor" value="2" onclick="updateGcsScore()" ><label for="motor2">2 - Extension to pain (decerebrate response)</label><br>
+            <input type="radio" id="motor1" name="motor" value="1" onclick="updateGcsScore()" ><label for="motor1">1 - No motor response</label>
+        </fieldset>
+
+
+
+        <p>GCS Score: <span id="gcsScore">0</span></p>
+
+
+        <textarea id="neuro" name="neuro" rows="4" cols="50" placeholder="signes neuro ici..."></textarea><br><br>
+
+
+        <h3>examen Rhumato</h3>
+        <textarea id="rhumato" name="rhumato" rows="4" cols="50" placeholder="signes rhumato ici..."></textarea><br><br>
+
+        <h3>blabla</h3>
+
+        <h3>Synthese de la consultation</h3>
+        <textarea id="synthese" name="synthese" rows="4" cols="50" placeholder="resume  ici..."></textarea><br><br>
+        <!-- Respiratory System Section -->
+        <!-- ... other sections ... -->
+
+        <!-- Blood Transfusion Section -->
+        <h3>Ever given a blood transfusion?</h3>
+        <label><input type="radio" name="blood_transfusion" value="yes" onclick="showCalendar()"> Yes</label>
+        <label><input type="radio" name="blood_transfusion" value="never" onclick="hideCalendar()"> Never</label>
+        <div id="calendar" style="display:none;">
+            <input type="date" name="transfusion_date">
+        </div>
+
+        <input type="submit" value="Submit">
+
+
+
+
+
+        <!-- Export Buttons -->
+        <button type="button" onclick="exportToJson()">Export to JSON</button>
+        <button type="button" onclick="exportToCsv()">Export to CSV</button>
+    </form>
+
+
+    <script>
+        function showCalendar() {
+            document.getElementById('calendar').style.display = 'block';
+        }
+
+        function hideCalendar() {
+            document.getElementById('calendar').style.display = 'none';
+        }
+    </script>
+
+    <script>
+
+      function calculateGcsScore() {
+      var eyeValue = document.querySelector('input[name="eye"]:checked');
+      var verbalValue = document.querySelector('input[name="verbal"]:checked');
+      var motorValue = document.querySelector('input[name="motor"]:checked');
+
+      var eyeScore = eyeValue ? parseInt(eyeValue.value) : 0;
+      var verbalScore = verbalValue ? parseInt(verbalValue.value) : 0;
+      var motorScore = motorValue ? parseInt(motorValue.value) : 0;
+
+      var totalScore = eyeScore + verbalScore + motorScore;
+      return totalScore;
+      }
+
+      function updateGcsScore() {
+          var gcsScore = calculateGcsScore();
+          document.getElementById('gcsScore').innerText = gcsScore;
+      }
+
+        
+
+
+
+        
+
+        
+    </script>
+</body>
+</html>
+
