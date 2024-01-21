@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<title>Demo d' interface et formatage d' export fichier pour analyse et apprentissage machine </title>
+
+<h2>proposition d' idees pour preciser et structurer les datas relatives au dossier medical </h2>
+
+
+
+<script>
+        
+
+
+
+        function exportToJson() {
+    var data = {
+        medicalHistory: document.getElementById("medicalHistory").value,
+        cardio: document.getElementById("cardio").value,
+        pneumo: document.getElementById("pneumo").value,
+        gastro: document.getElementById("gastro").value,
+        neuro: document.getElementById("neuro").value,
+        rhumato: document.getElementById("rhumato").value,
+        // Include other fields as necessary
+    };
+
+    // Handling checkboxes for Cardio, Pneumo, and Neuro
+    data['Cardio_cb'] = Array.from(document.querySelectorAll('input[name="cardioCheckbox"]:checked')).map(cb => cb.value);
+    data['Pneumo_cb'] = Array.from(document.querySelectorAll('input[name="pneumoCheckbox"]:checked')).map(cb => cb.value);
+    data['Gastro_cb'] = Array.from(document.querySelectorAll('input[name="gastroCheckbox"]:checked')).map(cb => cb.value);
+    data['Neuro_cb'] = Array.from(document.querySelectorAll('input[name="neuroCheckbox"]:checked')).map(cb => cb.value);
+    data['Rhumato_cb'] = Array.from(document.querySelectorAll('input[name="rhumatoCheckbox"]:checked')).map(cb => cb.value);
+
+    // Handling Radio Buttons (example for 'rdv')
+    var selectedRdv = document.querySelector('input[name="rdv"]:checked');
+    data['rdv'] = selectedRdv ? selectedRdv.value : null;
+
+    // Export to JSON
+    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
+    var downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", "form_data.json");
+    document.body.appendChild(downloadAnchorNode);
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+}
+
+        function exportToCsv() {
+            var data = [
+
+              ["gcsScore", calculateGcsScore()],
+
+                ["medicalHistory", document.getElementById("medicalHistory").value],
+                ["cardio", document.getElementById("cardio").value],
+                ["pneumo", document.getElementById("pneumo").value],
+                ["gastro", document.getElementById("gastro").value],
+                ["neuro", document.getElementById("neuro").value],
+                ["rhumato", document.getElementById("rhumato").value],
+                // Add other fields here as necessary
+            ];
+
+            var csvContent = "data:text/csv;charset=utf-8," + data.map(e => e.join(",")).join("\n");
+            var downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", csvContent);
+            downloadAnchorNode.setAttribute("download", "form_data.csv");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+
+
+        
+    </script>
+<style media="screen" type="text/css">
+
+        table{
+        border-collapse:collapse;
+        border:1px solid #FF0000;
+        }
+
+        table td{
+        border:1px solid #FF0000;
+
+        padding-top: 10px;
+        padding-bottom: 20px;
+        padding-left: 30px;
+        padding-right: 40px;
+        }
+
+
+        table tr:nth-child(7) {
+        background-color: rgba(255, 255, 0, 0.05); /* Jaune avec 20% d'opacité */
+        }
+
+        table tr:nth-child(8) {
+        background-color: rgba(255, 255, 0, 0.05); /* Jaune avec 20% d'opacité */
+        }
+
+
+        
+
+   
+
+        .highlight_red {
+        background-color: red;
+        opacity: 0.5; /* Set opacity to 100% for full visibility */
+        color: white; /* Optional: Change text color to white for better contrast */
+
+        .highlight_green {
+        background-color: green;
+        opacity: 0.5; /* Set opacity to 100% for full visibility */
+        color: white; /* Optional: Change text color to white for better contrast */
+
+        .highlight_blue {
+        background-color: blue;
+        opacity: 0.5; /* Set opacity to 100% for full visibility */
+        color: white; /* Optional: Change text color to white for better contrast */
+}
+        
+   </style>
+
+
+<style>
+        .split3H {
+            display: flex;
+        }
+
+        .left, .center, .right {
+            flex: 1; /* Adjust this value as needed */
+            padding: 10px;
+            border: 1px solid black;
+        }
+    </style>
+
+
+
+<style>
+
+            .colorCardio {
+background-color: rgba(255, 0, 0, 0.7);
+text-align: center;
+}
+
+        .colorPneumo {
+background-color: rgba(0, 0, 255, 0.25);
+text-align: center;
+}
+
+
+        .colorGastro {
+background-color: rgba(165, 45, 45, 0.8);
+text-align: center;
+}
+
+
+        .colorNeuro {
+background-color: rgba(125, 125, 125, 0.2);
+text-align: center;
+}
+
+
+        .colorRhumato {
+background-color: rgba(70, 70, 30, 0.2);
+text-align: center;
+}
+
+
+
+    </style>
+
+
+
+
+
+
+
+<style>
+
+* { box-sizing: border-box; }
+
+.timeline {
+  position: relative;
+  margin: 0 auto;
+  padding: 40px 60px;
+  background: #d6d6d6;
+  overflow: auto;
+}
+.timeline:after {
+  content: "";
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  top: 50%;
+  height: 8px;
+  background: #346abf;
+  border-radius: 3px;
+  z-index: 1;
+  transform: translateY(-50%);
+}
+
+.timeline article {
+  display: inline-block;
+  position: relative;
+  background: #eeeeee;
+  width: auto;
+  height: 70px;
+  padding: 10px;
+  margin: 0 0 50px 0;
+  vertical-align: top;
+}
+.timeline article:not(:first-child) {
+  margin-left: -20px;
+}
+.timeline article:not(:last-child) {
+  margin-right: -20px;
+}
+.timeline article:before {
+  content: "";
+  display: block;
+  position: absolute;
+  top: calc( 100% + 26px );
+  left: 50%;
+  background: #346abf;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+.timeline article:after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-left: 16px solid transparent;
+  border-right: 16px solid transparent;
+  border-top: 20px solid #eeeeee;
+  transform: translateX(-50%);
+}
+
+.timeline article:nth-child(even) {
+  margin-top: 140px;
+  margin-bottom: 0;
+}
+.timeline article:nth-child(even):before {
+  top: auto;
+  bottom: calc( 100% + 26px );
+}
+.timeline article:nth-child(even):after {
+  top: auto;
+  bottom: 100%;
+  border-left: 16px solid transparent;
+  border-right: 16px solid transparent;
+  border-bottom: 20px solid #eeeeee;
+  border-top: none;
+}
+
+
+.timeline article h2 {
+  font-size: 22px;
+  margin: 0;
+}
+
+</style>
+
+
+
+
+
+
+<script>
+    
+
+
+
+    function ToggleDermatomes() {
+      var img = document.getElementById('dermatomesImage');
+      if (img.style.display === 'none' || img.style.display === '') {
+          img.style.display = 'block'; // Or 'inline', 'inline-block', etc., depending on your layout
+      } else {
+          img.style.display = 'none';
+    }
+}
+</script>
+
+
+
+</head>
+<body>
+<form action="/submit-form-url" method="post">
+<h2>Medical Exam Form : simulation fake patient</h2>
+<!-- Patient Personal Information -->
+<label for="patientFirstName">prenom:</label>
+<input name="patientFirstName" readonly="" type="text" value="Dan"/><br/><br/>
+<label for="patientLastName">nom:</label>
+<input name="patientLastName" readonly="" type="text" value="Reynolds"/><br/><br/>
+<label for="patientJob">metier:</label>
+<input name="patientJob" readonly="" type="text" value="chanteur - Imagine Dragons"/><br/><br/>
+<label for="dob">Date of Birth:</label>
+<input name="dob" readonly="" type="text" value="14 juillet 1987"/><br/><br/>
+<label for="gender">Gender:</label>
+<select id="gender" name="gender">
+<option value="male">Male</option>
+<option value="female">Female</option>
+<option value="other">Other</option>
+</select><br/><br/>
+<img id="photo_patient" src="Dan_Reynolds_SPA.jpg" alt="Dan_Reynolds_SPA">
+
+
+<h3>ANTECEDANTS </h3>
+<div>
+<label><input id="diab1" name="antecedants" type="checkbox" value="diab1"/> diabete type 1</label>
+<label><input id="diab2NIR" name="antecedants" type="checkbox" value="diab2NIR"/> diabete type 2 NIR</label>
+<label><input id="Glaucome" name="antecedants" type="checkbox" value="Glaucome"/> Glaucome</label><br/>
+<label><input id="Cancer" name="antecedants" type="checkbox" value="Cancer"/> Cancer</label><br/>
+<label><input id="Tuberculose" name="antecedants" type="checkbox" value="Tuberculose"/> Tuberculose</label><br/>
+
+<label><input id="Chir_baryatrique" name="antecedants" type="checkbox" value="Chir_baryatrique"/> Chir_baryatrique</label><br/>
+
+<label><input id="ischiemie_membre" name="antecedants" type="checkbox" value="ischiemie_membre"/> ischiemie_membre</label><br/>
+<label><input id="AIT_AVC" name="antecedants" type="checkbox" value="AIT_AVC"/> AIT_AVC</label><br/>
+<label><input id="Angor_IDM" name="antecedants" type="checkbox" value="Angor_IDM"/> Angor_IDM</label><br/>
+<label><input id="thrombose" name="antecedants" type="checkbox" value="thrombose"/> thrombose</label><br/>
+<label><input id="Ulcere_GD" name="antecedants" type="checkbox" value="Ulcere_GD"/> Ulcere_GD</label><br/>
+<label><input id="Asthme" name="antecedants" type="checkbox" value="Asthme"/> Asthme</label><br/>
+<label><input id="Anaphylaxie" name="antecedants" type="checkbox" value="Anaphylaxie"/> Anaphylaxie</label><br/>
+<label><input id="Drepanocytose" name="antecedants" type="checkbox" value="Drepanocytose"/> Drepanocytose</label><br/>
+<label><input id="Epilepsie" name="antecedants" type="checkbox" value="Epilepsie" checked/> Epilepsie</label><br/>
+<label><input id="QT_long" name="antecedants" type="checkbox" value="QT_long"/> QT_long</label><br/>
+<label><input id="HLA_B27" name="antecedants" type="checkbox" value="HLA_B27" checked/> HLA_B27</label><br/>
+<label><input id="RectoColite_hemmoragique" name="antecedants" type="checkbox" value="RectoColite_hemmoragique" checked /> RectoColite_hemmoragique</label><br/>
+
+
+
+
+<label><input id="insuf_renale_chronique" name="antecedants" type="checkbox" value="insuf_renale_chronique"/> insuf_renale_chronique</label><br/>
+<label><input id="dialyse" name="antecedants" type="checkbox" value="dialyse"/> dialyse</label><br/>
+
+</div>
+
+
+<h3>TRAITEMENT ACTUEL </h3>
+
+<table>
+          <tr>
+            <th>
+                <td>15.12.2023</td>                            
+                <td>21.12.2023</td>
+                <td>03.01.2024</td>
+                <td>??.01.2024</td>
+                <td>11.09.2024</td>
+            </th>
+          </tr>
+          <tr>
+            <td>Solupred 1mg/kg cp pour 3 mois renouv</td>
+            <td>60-0-0</td>
+            <td class="highlight_blue">60-0-0</td>
+            <td>60-0-0</td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Rifampicine 600mg cp</td>
+            <td >1.0.1</td>
+            <td>1.0.1</td>
+            <td class="highlight_red" >STOP</td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Lamotrigine</td>
+            <td>?</td>
+            <td>?</td>
+            <td>?</td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <tr>
+            <td>Biotherapie</td>
+            <td ></td>
+            <td></td>
+            <td></td>
+            <td class="highlight_green">Introduction</td>
+            <td></td>
+          </tr>
+            
+          <tr>
+            <td>Paracetamol</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+        </table>
+
+
+<h1> <strong> TIMELINE <strong>- Visuel chronologique des faits marquants </h1>
+
+
+<div class="timeline">
+  <article>
+    <h2>Premiere douleurs rachis nocturnes </h2>
+    <strong>VS  195</strong> le <em>15 12 2023</em>
+  </article>
+  <article>
+    <h2>HLA B27+ </h2>
+    <em>03 janvier 2024</em>
+  </article>
+  <article>
+    <h2>Suspicion tuberculose latente lors bilan pre-therapeutique </h2>
+    <em>avril 2024</em>
+  </article>
+</div>
+
+
+
+<div class="timeline">
+
+  <article>
+    <h2>Antiobiotherapie visee anti tuberculeuse</h2>
+    <em>15 mai 2024</em>
+  </article>
+  <article>
+    <h2>rechute Epilesie + Hepatite medicamenteuse ? </h2>
+    <h2>induction enzym / anti epileptiques  => Stop Rifampicine </h2>
+    <em>3 juin 2024</em>
+  </article>
+  <article>
+    <h2>Instauration corticotherapie</h2>
+    <h2> Prednisolone 1mg/kg soit 75mg/j</h2>
+    <em>1 juillet 2024</em>
+  </article>
+</div>
+
+<div class="timeline">
+  <article>
+    <h2>Decompensation psy + hyperglycemie </h2>
+    <h2> probablement EI steroides : stop Prednisolone</h2>
+    <em>14 juillet 2024</em>
+  </article>
+  <article>
+    <h2>Introduction biotherapie ciblee</h2>
+    <em>11 septembre 2024</em>
+  </article>
+  <article>
+    <h2>Nette amelioration bonne tolerance </h2>
+    <em>24 décembre 2024</em>
+  </article>
+</div>
+
+
+
+
+
+<div>
+<br/><br/>
+</div>
+
+
+
+
+
+
+
+         <table>
+          <tr>
+            <th>
+                <td>15.12.2023</td>                            
+                <td>21.12.2023</td>
+                <td>03.01.2024</td>
+            </th>
+          </tr>
+          <tr>
+            <td>Hemoglobine</td>
+            <td>11.7</td>
+            <td>13.1</td>
+            <td>12.9</td>
+          </tr>
+          <tr>
+            <td>Leucocytes</td>
+            <td class="highlight_red">13.212</td>
+            <td>6.509</td>
+            <td>7.050</td>
+          </tr>
+          <tr>
+            <td>Facteur Rhumatoide</td>
+            <td>Negatif</td>
+            <td></td>
+            <td>Negatif</td>
+          </tr>
+          <tr>
+            <td>Anticorps anti-CPP</td>
+            <td>Negatif</td>
+            <td></td>
+            <td>Negatif</td>
+          </tr>
+          <tr>
+            <tr>
+            <td>VS</td>
+            <td class="highlight_red">149  </td>
+            <td>4</td>
+            <td>1</td>
+          </tr>
+            <td>ASAT</td>
+            <td>32</td>
+            <td>25</td>
+            <td>17</td>
+          </tr>
+          <tr>
+            <td>ALAT</td>
+            <td>39</td>
+            <td>22</td>
+            <td>21</td>
+          </tr>
+          <tr>
+            <td>HbA1c</td>
+            <td></td>
+            <td>5.6</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>fn renale ml/min</td>
+            <td>90</td>
+            <td>110</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>INR</td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>HLA</td>
+            <td></td>
+            <td></td>
+            <td>B27</td>
+          </tr>
+        </table>
+
+<!-- Blood Transfusion Section -->
+<h3>Deja eu une coloscopie ? </h3>
+<label><input name="deja_colo" onclick="showCalendar()" type="radio" value="yes"/> Yes</label>
+<label><input name="deja_colo" onclick="hideCalendar()" type="radio" value="never"/> Never</label>
+<div id="calendar" style="display:none;">
+<input name="coloscopie_date" type="date"/>
+</div>
+
+<h3>Medical History</h3>
+<textarea cols="50" id="medicalHistory" name="medicalHistory" placeholder="Enter medical history here..." rows="4"></textarea><br/><br/>
+<h3>Condition RDV</h3>
+<label><input name="rdv" type="radio" value="sans_rdv"/> Sans RDV</label>
+<label><input name="rdv" type="radio" value="programme"/> Programme</label>
+<label><input name="rdv" type="radio" value="emergency"/> En Urgence</label>
+<label><input name="rdv" type="radio" value="requisition"/> Requisition</label>
+<br/><br/>
+
+
+
+        <table>
+          <tr>
+            <th>
+                <td>15.12.2023</td>                            
+                <td>21.12.2023</td>
+                <td>03.01.2024</td>
+            </th>
+          </tr>
+          <tr>
+            <td>TA mm Hg</td>
+            <td>95/65</td>
+            <td>130/80</td>
+            <td>125/75</td>
+          </tr>
+          <tr>
+            <td>Poids</td>
+            <td>69</td>
+            <td>74</td>
+            <td>73.5</td>
+          </tr>
+          <tr>
+            <td>Sat O2 %</td>
+            <td>95</td>
+            <td>98</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>PeakFlow L/min</td>
+            <td>450</td>
+            <td>600</td>
+            <td></td>
+          </tr>
+          <tr>
+            <tr>
+            <td>temperature °C</td>
+            <td>39.9</td>
+            <td>36.6</td>
+            <td></td>
+          </tr>
+            <td>dextro g/L</td>
+            <td>0.85</td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>alimentation</td>
+            <td>anorexie</td>
+            <td>normal</td>
+            <td>normal</td>
+          </tr>
+          <tr>
+            <td>Douleur EVA /10</td>
+            <td>7</td>
+            <td>2</td>
+            <td>0</td>
+          </tr>
+          <tr>
+            <td>humeur</td>
+            <td>anxiété</td>
+            <td>normal</td>
+            <td>normal</td>
+          </tr>
+        </table> 
+
+
+<!-- examen Cardiologique -->
+<h3>examen Cardiologique</h3>
+
+<div class="split3H colorCardio">
+        <div class="left">
+            <p> Professeur Heart , il y a un an</p>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque fermentum massa vel enim feugiat gravida.</p>
+            <p> CONCLUSION : Epreuve d' effort à refaire dans six mois.</p>
+        </div>
+        <div class="center">
+            <p> Professeur Heart , il y a 6 mois</p>
+            <p>Donec ut libero sed arcu vehicula ultricies a non tortor. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            <p> CONCLUSION : Epreuve d' effort satisfaisante, proposition de controle ECG par le medecin generaliste dans 6 mois.</p>
+        </div>
+        <div class="right">
+            <p> Dr MOI, ce jour</p>
+            
+            <div class="checkbox-cardio" id="group_cardio">
+
+        
+                <label><input type="checkbox" name="cardioCheckbox" value="angor effort"> angor effort</label>
+                <label><input type="checkbox" name="cardioCheckbox" value="angor instable"> angor instable</label>
+                <label><input type="checkbox" name="cardioCheckbox" value="palpitation effort"> palpitation effort</label><br>
+                <label><input type="checkbox" name="cardioCheckbox" value="palpitation repos"> palpitation repos</label>
+                <label><input type="checkbox" name="cardioCheckbox" value="OMI"> OMI </label>
+                <label><input type="checkbox" name="cardioCheckbox" value="TJ"> TJ</label>
+                <label><input type="checkbox" name="cardioCheckbox" value="RHJ"> RHJ</label><br>
+                <label><input type="checkbox" name="cardioCheckbox" value="syncope"> syncope</label>
+                <label><input type="checkbox" name="cardioCheckbox" value="HTA"> HTA</label>
+                <label><input type="checkbox" name="cardioCheckbox" value="perte pouls periph"> perte pouls periph</label><br>
+                <label><input type="checkbox" name="cardioCheckbox" value="souffle valvulaire"> souffle valvulaire</label>
+                <label><input type="checkbox" name="cardioCheckbox" value="cyanose"> cyanose</label>
+                <label><input type="checkbox" name="cardioCheckbox" value="bruit galop"> bruit galop</label>
+                <label><input type="checkbox" name="cardioCheckbox" value="fremitus"> fremitus</label><br>
+                <label><input type="checkbox" name="cardioCheckbox" value="souffle carotidien"> souffle carotidien</label><br>
+                <label><input type="checkbox" name="cardioCheckbox" value="baisse FEVG"> baisse FEVG</label><br>
+                <label><input type="checkbox" name="cardioCheckbox" value="epanch pericarde"> epanch pericarde</label><br>
+            </div>
+
+                <textarea cols="50" id="cardio" name="cardio" placeholder="signes cardio ici..." rows="4"></textarea><br/><br/>
+
+
+        </div>
+</div>
+
+
+
+<!-- examen Pneumologique -->
+<h3>examen Pneumologique</h3>
+
+
+
+<div class="split3H colorPneumo">
+        <div class="left">
+            <p> Professeur Lungs , il y a 3 mois</p>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque fermentum massa vel enim feugiat gravida.</p>
+            <p> CONCLUSION : Examen Fonctionnel Respiratoire dans les limites de la normale, possible debut de BPCO. Sevrer Tabac</p>
+        </div>
+        
+        <div class="center">
+            <p> Dr MOI, ce jour</p>
+            
+            <div class="checkbox-pneumo" id="group_pneumo">
+                <label><input id="sibilant" name="pneumoCheckbox" type="checkbox" value="sibilant"/> sibilant</label>
+                <label><input id="hemoptysie" name="pneumoCheckbox" type="checkbox" value="hemoptysie"/> hemoptysie</label><br/>
+                <label><input type="checkbox" name="pneumoCheckbox" value="frein expi"> frein expi</label>
+                <label><input type="checkbox" name="pneumoCheckbox" value="sibilant"> sibilant</label>
+                <label><input type="checkbox" name="pneumoCheckbox" value="toux seche"> toux seche</label>
+                <label><input type="checkbox" name="pneumoCheckbox" value="toux grasse"> toux grasse </label>
+                <label><input type="checkbox" name="pneumoCheckbox" value="expectoration"> expectoration</label>
+                <label><input type="checkbox" name="pneumoCheckbox" value="dyspnee repos"> dyspnee repos</label><br>
+                <label><input type="checkbox" name="pneumoCheckbox" value="dyspnee effort"> dyspnee effort</label>
+                <label><input type="checkbox" name="pneumoCheckbox" value="desatur < 90%"> desatur < 90%</label>
+                <label><input type="checkbox" name="pneumoCheckbox" value="polypnee"> polypnee</label><br>
+                <label><input type="checkbox" name="pneumoCheckbox" value="sueurs"> sueurs</label>
+                <label><input type="checkbox" name="pneumoCheckbox" value="cyanose"> cyanose</label>
+                <label><input type="checkbox" name="pneumoCheckbox" value="sd restictif"> sd restictif</label>
+                <label><input type="checkbox" name="pneumoCheckbox" value="thorax en tonneau"> thorax en tonneau</label><br>
+                <label><input type="checkbox" name="pneumoCheckbox" value="sd alveolaire"> sd alveolaire</label><br>
+                <label><input type="checkbox" name="pneumoCheckbox" value="sd intersticiel"> sd intersticiel</label><br>
+                <label><input type="checkbox" name="pneumoCheckbox" value="atelectasie"> atelectasie</label><br>
+        </div>
+                <textarea cols="50" id="pneumo" name="pneumo" placeholder="signes pneumo ici..." rows="4"></textarea><br/><br/>
+
+
+        </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+<h3>appareil "gastro" </h3>
+
+
+<div class="split3H colorGastro">
+        <div class="left">
+            <p> Professeur Stomach , il y a cinq an</p>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque fermentum massa vel enim feugiat gravida.</p>
+            <p> CONCLUSION : Coloscopie retrouve des diverticules sans signe de gravité.</p>
+        </div>
+        <div class="center">
+            <p> Professeur Bowels , il y a trois ans</p>
+            <p>Donec ut libero sed arcu vehicula ultricies a non tortor. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            <p> CONCLUSION : FOGD retrouve ulcere gastrique sans signe de malignité, cytologie ok, mettre protocole habituel.</p>
+        </div>
+        <div class="right">
+            <p> Dr MOI, ce jour</p>
+            
+            <div class="checkbox-gastro" id="group_gastro">
+                <label><input id="diarhee" name="gastroCheckbox" type="checkbox" value="diarhee"/> diarhee</label>
+                <label><input id="deshydrate" name="gastroCheckbox" type="checkbox" value="deshydrate"/> deshydrate</label>
+                <label><input id="constipation" name="gastroCheckbox" type="checkbox" value="constipation"/> constipation</label>
+
+
+                <label><input type="checkbox" name="gastroCheckbox" value="diarhee"> diarhee</label>
+                <label><input type="checkbox" name="gastroCheckbox" value="constipation"> constipation</label>
+                <label><input type="checkbox" name="gastroCheckbox" value="fecalome"> fecalome</label><br>
+                <label><input type="checkbox" name="gastroCheckbox" value="nausee"> nausee</label>
+                <label><input type="checkbox" name="gastroCheckbox" value="vomissement"> vomissement</label>
+                <label><input type="checkbox" name="gastroCheckbox" value="meteorisme"> meteorisme</label>
+                <label><input type="checkbox" name="gastroCheckbox" value="ascite"> ascite</label><br>
+                <label><input type="checkbox" name="gastroCheckbox" value="hemathemese"> hemathemese</label>
+                <label><input type="checkbox" name="gastroCheckbox" value="rectorragie"> rectorragie</label>
+                <label><input type="checkbox" name="gastroCheckbox" value="melena"> melena</label><br>
+                <label><input type="checkbox" name="gastroCheckbox" value="abd cicatriciel"> abd cicatriciel</label>
+                <label><input type="checkbox" name="gastroCheckbox" value="ictere"> ictere</label>
+                <label><input type="checkbox" name="gastroCheckbox" value="angiome stellaire"> angiome stellaire</label>
+                <label><input type="checkbox" name="gastroCheckbox" value="circulation veineuse abdo collat"> circulation veineuse abdo collat</label><br>
+                <label><input type="checkbox" name="gastroCheckbox" value="hepatomegalie"> hepatomegalie</label><br>
+                <label><input type="checkbox" name="gastroCheckbox" value="splenomegalie"> splenomegalie</label><br>
+              </div>
+
+
+                <textarea cols="50" id="gastro" name="gastro" placeholder="signes gastro ici..." rows="4"></textarea><br/><br/>
+
+
+        </div>
+</div>
+
+
+
+
+
+
+<!-- Add more sections for Percussion, Auscultation, etc. -->
+<h3>examen Neuro</h3>
+
+
+
+
+<div id="imageContainer">
+        <button id="toggleButton" type="button" onclick="ToggleDermatomes()">Toggle Image</button>
+        <img id="dermatomesImage" src="dermatomes.jpg" alt="Dermatome Image">
+</div>
+
+
+<div class="checkbox-neuro colorNeuro" id="group_neuro">
+<label><input id="ataxie" name="neuroCheckbox" type="checkbox" value="ataxie"/> ataxie</label>
+<label><input id="apraxie" name="neuroCheckbox" type="checkbox" value="apraxie"/> apraxie</label>
+
+<label><input id="sd_meninge" name="neuroCheckbox" type="checkbox" value="sd_meninge"/> sd_meninge</label>
+<label><input id="sd_pyramidal" name="neuroCheckbox" type="checkbox" value="sd_pyramidal"/> sd_pyramidal</label>
+<label><input id="sd_extrapyramidal" name="neuroCheckbox" type="checkbox" value="sd_extrapyramidal"/> sd_extrapyramidal</label><br/>
+<label><input id="ataxie" name="neuroCheckbox" type="checkbox" value="ataxie"/> ataxie</label>
+<label><input id="apraxie" name="neuroCheckbox" type="checkbox" value="apraxie"/> apraxie</label>
+<label><input id="anosognosie" name="neuroCheckbox" type="checkbox" value="anosognosie"/> anosognosie</label>
+<label><input id="insomnie" name="neuroCheckbox" type="checkbox" value="insomnie"/> insomnie</label>
+<label><input id="demence" name="neuroCheckbox" type="checkbox" value="demence"/> demence</label>
+<label><input id="myosis" name="neuroCheckbox" type="checkbox" value="myosis"/> myosis</label>
+<label><input id="mydriase" name="neuroCheckbox" type="checkbox" value="mydriase"/> mydriase</label>
+
+
+
+</div>
+
+
+
+
+
+
+<fieldset>
+<legend>Eye Response (E)</legend>
+<input id="eye4" name="eye" onclick="updateGcsScore()" type="radio" value="4"/><label for="eye4">4 - Spontaneously</label><br/>
+<input id="eye3" name="eye" onclick="updateGcsScore()" type="radio" value="3"/><label for="eye3">3 - To speech</label><br/>
+<input id="eye2" name="eye" onclick="updateGcsScore()" type="radio" value="2"/><label for="eye2">2 - To pain</label><br/>
+<input id="eye1" name="eye" onclick="updateGcsScore()" type="radio" value="1"/><label for="eye1">1 - No eye opening</label>
+</fieldset>
+<fieldset>
+<legend>Verbal Response (V)</legend>
+<input id="verbal5" name="verbal" onclick="updateGcsScore()" type="radio" value="5"/><label for="verbal5">5 - Oriented</label><br/>
+<input id="verbal4" name="verbal" onclick="updateGcsScore()" type="radio" value="4"/><label for="verbal4">4 - Confused</label><br/>
+<input id="verbal3" name="verbal" onclick="updateGcsScore()" type="radio" value="3"/><label for="verbal3">3 - Inappropriate words</label><br/>
+<input id="verbal2" name="verbal" onclick="updateGcsScore()" type="radio" value="2"/><label for="verbal2">2 - Incomprehensible sounds</label><br/>
+<input id="verbal1" name="verbal" onclick="updateGcsScore()" type="radio" value="1"/><label for="verbal1">1 - No verbal response</label>
+</fieldset>
+<fieldset>
+<legend>Motor Response (M)</legend>
+<input id="motor6" name="motor" onclick="updateGcsScore()" type="radio" value="6"/><label for="motor6">6 - Obeys commands</label><br/>
+<input id="motor5" name="motor" onclick="updateGcsScore()" type="radio" value="5"/><label for="motor5">5 - Localizes pain</label><br/>
+<input id="motor4" name="motor" onclick="updateGcsScore()" type="radio" value="4"/><label for="motor4">4 - Withdraws to pain</label><br/>
+<input id="motor3" name="motor" onclick="updateGcsScore()" type="radio" value="3"/><label for="motor3">3 - Flexion to pain (decorticate response)</label><br/>
+<input id="motor2" name="motor" onclick="updateGcsScore()" type="radio" value="2"/><label for="motor2">2 - Extension to pain (decerebrate response)</label><br/>
+<input id="motor1" name="motor" onclick="updateGcsScore()" type="radio" value="1"/><label for="motor1">1 - No motor response</label>
+</fieldset>
+<p>GCS Score: <span id="gcsScore">0</span></p>
+<textarea cols="50" id="neuro" name="neuro" placeholder="signes neuro ici..." rows="4"></textarea><br/><br/>
+
+
+
+
+
+<h3>examen Rhumato</h3>
+
+<div class="checkbox-rhumato" id="group_rhumato">
+                <label><input type="checkbox" name="rhumatoCheckbox" value="boiterie"> boiterie</label>
+                <label><input type="checkbox" name="rhumatoCheckbox" value="deformation_rachis"> deformation rachis</label>
+                <label><input type="checkbox" name="rhumatoCheckbox" value="raideur_matinale"> raideur matinale</label>
+                <label><input type="checkbox" name="rhumatoCheckbox" value="horraire_mecanique"> horraire mecanique</label>
+                <label><input type="checkbox" name="rhumatoCheckbox" value="ankylose"> ankylose</label>
+                
+        </div>
+
+
+<textarea cols="50" id="rhumato" name="rhumato" placeholder="signes rhumato ici..." rows="4"></textarea><br/><br/>
+
+
+
+<h3> Aide memoire</h3>
+
+<img id="spa_circles" src="spa_circles.jpg" alt="spa_circles">
+
+<h3> Protocole actuel adapte au patient</h3>
+
+<img id="algo_ttt_spa" src="algo_ttt_spa.jpg" alt="algo_ttt_spa">
+
+
+
+<h3>Synthese de la consultation</h3>
+<textarea cols="50" id="synthese" name="synthese" placeholder="resume  ici..." rows="4"></textarea><br/><br/>
+<!-- Respiratory System Section -->
+<!-- ... other sections ... -->
+<!-- Blood Transfusion Section -->
+<h3>Ever given a blood transfusion?</h3>
+<label><input name="blood_transfusion" onclick="showCalendar()" type="radio" value="yes"/> Yes</label>
+<label><input name="blood_transfusion" onclick="hideCalendar()" type="radio" value="never"/> Never</label>
+<div id="calendar" style="display:none;">
+<input name="transfusion_date" type="date"/>
+</div>
+<!-- Export Buttons -->
+<button onclick="exportToJson()" type="button">Export to JSON</button>
+<button onclick="exportToCsv()" type="button">Export to CSV</button>
+
+
+
+<input type="submit" value="Submit"/>
+
+</form>
+<script>
+        function showCalendar() {
+            document.getElementById('calendar').style.display = 'block';
+        }
+
+        function hideCalendar() {
+            document.getElementById('calendar').style.display = 'none';
+        }
+    </script>
+<script>
+
+      function calculateGcsScore() {
+      var eyeValue = document.querySelector('input[name="eye"]:checked');
+      var verbalValue = document.querySelector('input[name="verbal"]:checked');
+      var motorValue = document.querySelector('input[name="motor"]:checked');
+
+      var eyeScore = eyeValue ? parseInt(eyeValue.value) : 0;
+      var verbalScore = verbalValue ? parseInt(verbalValue.value) : 0;
+      var motorScore = motorValue ? parseInt(motorValue.value) : 0;
+
+      var totalScore = eyeScore + verbalScore + motorScore;
+      return totalScore;
+      }
+
+      function updateGcsScore() {
+          var gcsScore = calculateGcsScore();
+          document.getElementById('gcsScore').innerText = gcsScore;
+      }
+
+        
+
+
+
+        
+
+        
+    </script>
+</body>
+</html>
+
+
